@@ -1,0 +1,112 @@
+% Contributors:
+% Course Number: ASEN 3801
+% File Name: MainLab1
+% Last Updated: 8/26/25
+
+clc
+clear
+close all
+
+%% Nonzero Initial Conditions
+w = 1;
+x = 1;
+y = 1;
+z = 1;
+
+%% Derivative Equations
+wdot = -9*w + y;
+xdot = 4*w*x*y - x^2;
+ydot = 2*w - x - 2*z;
+zdot = x*y - y^2 - 3*(z^3);
+
+%% tspan and tolerance
+% tspan = [0 20];
+
+%% Calling ODE45
+% [tw,w] = ode45(@(tw,w) wdot,tspan,w);
+% [tx,x] = ode45(@(tx,x) xdot,tspan,x);
+% [ty,y] = ode45(@(ty,y) ydot,tspan,y);
+% [tz,z] = ode45(@(tz,z) zdot,tspan,z);
+
+%% Plotting ODE45
+% figure(); hold on;
+% plot(tw,w); %plotting w vs t
+% plot(tx,x); %plotting x vs t
+% plot(ty,y); %plotting y vs t
+% plot(tz,z); %plotting z vs t
+% legend();
+
+%% Q2 Parts B,C,D,E
+% Part A equation to base future parts off of
+
+% function xdot = objectEOM(t,x,rho,Cd,A,m,g,wind_vel) function from 2a
+
+%% Part B, calling atmos data for boulder 1655m
+% Initial conditions need for object EOM
+rho = stdatmo(1655); % Returns density in kg/m^3
+
+Cd = 0.6; % Coefficient of Drag
+diameter = 2.0 / 100; % Diameter of sphere [cm --> m]
+A = pi * (diameter/2)^2; % Cross sectional area of sphere
+m = 50 / 1000; % Mass [g --> kg]
+g = 9.81; % Gravity [m/s^2]
+wind_vel = 0; % Wind velocity [m/s]
+
+%% Part C, given initial conditions, solve 2a equation
+% Wind 0 in this part
+
+% statevector: [x,y,z,vx,vy,vz]
+tspan = [0 20]; % Time span 0 to 20 time units
+intialcond = [0;0;0;0;20;-20]; % At origin (m), moving 20 m/s east and upwards
+tol = 1e-8; % Tolerance for ode45 call
+
+% Calling ode to find solution, set event to end ode when object reaches ground again.
+function [value, isterminal, direction] = groundhit(t,statevector)
+    % Event function to detect when the height of the object returns to 0
+    value = statevector(3); % When object returns to z = 0 after the first time
+    isterminal = 1; % To indicate to ode to stop running simulation
+    direction = 0;
+end
+
+options = odeset('RelTol',tol,'AbsTol',tol,'Events',@groundhit); % Setting tolerance options and termination event
+[t,statevector] = ode45(@(t,statevector) objectEOM(t,x,rho,Cd,A,m,g,wind_vel),tspan,intialcond,options); % Call of ode function
+
+% 3D Plot of object trajectory
+figure();
+plot3(statevector(:,1),statevector(:,2),statevector(:,3));
+xlabel('X/North (m)');
+ylabel('Y/East (m);');
+zlabel('Z/down (m)');
+title('Question 2c, 3D Trajectory');
+set(gca, 'Zdir', 'reverese'); % Flipping z-axis
+
+%% Starter code for 2D
+% Same initial conditions as 2c, varying wind speed, plot all on 1 figure
+
+% Creating vector of wind speed from 0 to 20 m/s
+windspeedvec = linspace(0,20,5); % [m/s], o to ~45 mph winds
+names = ['zero','five','ten','fifteen','twenty']; % List of names corresponding to each wind speed
+
+% Looping through windspeed vector storing each call in question 2d
+% structure and assigning name to each sub speed of wind vector with x,y,z
+% information inside.
+for i = 1:length(windspeedvec)
+    [t,statevector] = ode45(@(t,statevector) objectEOM(t,x,rho,Cd,A,m,g,windspeedvec(i)),tspan,initialcond,options);
+    q2d.(names(i)).x = statevector(1); % X component
+    q2d.(names(i)).y = statevector(2); % Y component
+    q2d.(names(i)).z = statevector(3); % Z component
+end
+
+% Creating a plot with all wind speed trajectories on one
+figure(); hold on;
+% Loop through all wind speed vectors and call information to plot from
+% structure
+for i = 1:length(windspeedvec)
+    plot3(q2d.(names(i)).x,q2d.(names(i)).y,q2d.(names(i)).z);
+end
+xlabel('X/North (m)');
+ylabel('Y/East (m)');
+zlabel('Z/down (m)');
+title("Question 2d, Variable Wind Speeds on trajectories");
+set(gca,'Zdir','reverse'); % Flipping z-axis
+legend(names); % Adds legend using name list corresponding to wind speeds
