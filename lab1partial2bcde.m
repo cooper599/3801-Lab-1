@@ -57,7 +57,7 @@ wind_vel = 0; % Wind velocity [m/s]
 
 % statevector: [x,y,z,vx,vy,vz]
 tspan = [0 20]; % Time span 0 to 20 time units
-intialcond = [0;0;0;0;20;-20]; % At origin (m), moving 20 m/s east and upwards
+initialcond = [0;0;0;0;20;-20]; % At origin (m), moving 20 m/s east and upwards
 tol = 1e-8; % Tolerance for ode45 call
 
 % Calling ode to find solution, set event to end ode when object reaches ground again.
@@ -69,7 +69,7 @@ function [value, isterminal, direction] = groundhit(t,statevector)
 end
 
 options = odeset('RelTol',tol,'AbsTol',tol,'Events',@groundhit); % Setting tolerance options and termination event
-[t,statevector] = ode45(@(t,statevector) objectEOM(t,x,rho,Cd,A,m,g,wind_vel),tspan,intialcond,options); % Call of ode function
+[t,statevector] = ode45(@(t,x) objectEOM(t,x,rho,Cd,A,m,g,wind_vel),tspan,initialcond,options); % Call of ode function
 
 % 3D Plot of object trajectory
 figure();
@@ -78,23 +78,23 @@ xlabel('X/North (m)');
 ylabel('Y/East (m);');
 zlabel('Z/down (m)');
 title('Question 2c, 3D Trajectory');
-set(gca, 'Zdir', 'reverese'); % Flipping z-axis
+set(gca, 'ZDir', 'reverse'); % Flipping z-axis
 
 %% Starter code for 2D
 % Same initial conditions as 2c, varying wind speed, plot all on 1 figure
 
 % Creating vector of wind speed from 0 to 20 m/s
 windspeedvec = linspace(0,20,5); % [m/s], o to ~45 mph winds
-names = ['zero','five','ten','fifteen','twenty']; % List of names corresponding to each wind speed
+names = ["zero","five","ten","fifteen","twenty"]; % List of names corresponding to each wind speed
 
 % Looping through windspeed vector storing each call in question 2d
 % structure and assigning name to each sub speed of wind vector with x,y,z
 % information inside.
 for i = 1:length(windspeedvec)
-    [t,statevector] = ode45(@(t,statevector) objectEOM(t,x,rho,Cd,A,m,g,windspeedvec(i)),tspan,initialcond,options);
-    q2d.(names(i)).x = statevector(1); % X component
-    q2d.(names(i)).y = statevector(2); % Y component
-    q2d.(names(i)).z = statevector(3); % Z component
+    [t,statevector] = ode45(@(t,x) objectEOM(t,x,rho,Cd,A,m,g,windspeedvec(i)),tspan,initialcond,options);
+    q2d.(names(i)).x = statevector(:,1); % X component
+    q2d.(names(i)).y = statevector(:,2); % Y component
+    q2d.(names(i)).z = statevector(:,3); % Z component
 end
 
 % Creating a plot with all wind speed trajectories on one
@@ -108,5 +108,20 @@ xlabel('X/North (m)');
 ylabel('Y/East (m)');
 zlabel('Z/down (m)');
 title("Question 2d, Variable Wind Speeds on trajectories");
-set(gca,'Zdir','reverse'); % Flipping z-axis
+set(gca,'ZDir','reverse'); % Flipping z-axis
 legend(names); % Adds legend using name list corresponding to wind speeds
+view(45,45);
+
+%% EOM Function
+function xDot = objectEOM(t, x, rho, Cd, A, m, g, vWind)
+%UNTITLED2 Summary of this function goes here
+%   Detailed explanation goes here
+    v = x(4:6);
+    vRel = v-vWind;
+    airspeed = norm(vRel);
+    D = 0.5*rho*(airspeed^2)*A*Cd;
+    fDrag = -D*(vRel/airspeed);
+    fGrav = [0;0;m*g];
+    acc = (fDrag+fGrav)/m;
+    xDot = [v; acc];
+end
