@@ -82,8 +82,8 @@ set(gca, 'ZDir', 'reverse'); % Flipping z-axis
 % Same initial conditions as 2c, varying wind speed, plot all on 1 figure
 
 % Creating vector of wind speed from 0 to 20 m/s
-windspeedvec = linspace(0,20,5); % [m/s], o to ~45 mph winds
-names = ["zero","five","ten","fifteen","twenty"]; % List of names corresponding to each wind speed
+windspeedvec = linspace(0,20,21); % [m/s], o to ~45 mph winds
+names = ["zero","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen","twenty"]; % List of names corresponding to each wind speed
 
 % Looping through windspeed vector storing each call in question 2d
 % structure and assigning name to each sub speed of wind vector with x,y,z
@@ -107,40 +107,90 @@ ylabel('Y/East (m)');
 zlabel('Z/down (m)');
 title("Question 2d, Variable Wind Speeds on trajectories");
 set(gca,'ZDir','reverse'); % Flipping z-axis
-legend(names); % Adds legend using name list corresponding to wind speeds
+legend(names,location="eastoutside"); % Adds legend using name list corresponding to wind speeds
 view(45,45);
 
 % Part d1, creating plot of horizontal displacement vs wind speed
 % In meters of deflection per m/s wind speed
 figure(); hold on;
 for i = 1:length(names)
-    scatter(q2d.(names(i)).x(end),windspeedvec(i)); % Scatter plot for naming points
+    % scatter(q2d.(names(i)).x(end),windspeedvec(i)); % Scatter plot for naming points
     tempx(i) = q2d.(names(i)).x(end);
 end
 plot(tempx,windspeedvec); % Connecting Dots
 xlabel("Meters of Deflection (m)");
 ylabel("Wind Speed (m/s)");
-legend(names,location="best");
+% legend(names,location="best");
 title("Question 2dp1, X Displacement vs Wind Speed");
-xlim([-1 15]);
-ylim([-1 25]);
+xlim([-1 8]);
+ylim([-1 21]);
 
 % Part d2, creating plot of total distance
 % Total distance from origin dependsing on wind speed in meters of
 % deflection per m/s of wind speed
 figure(); hold on;
 for i = 1:length(names)
-    q2d.(names(i)).dtot(i) = max(sqrt(q2d.(names(i)).x(end)^2 + q2d.(names(i)).y(end)^2));
-    scatter(q2d.(names(i)).dtot,windspeedvec(i));
-    tempx2(i)= q2d.(names(i)).dtot;
+    q2d.(names(i)).dtot(i) = sqrt(q2d.(names(i)).x(end)^2 + q2d.(names(i)).y(end)^2);
+    % scatter(q2d.(names(i)).dtot(end),windspeedvec(i));
+    tempx2(i)= q2d.(names(i)).dtot(end);
 end
 plot(tempx2,windspeedvec);
 xlabel("Meters of Deflection (m)");
 ylabel("Wind Speed (m/s)");
 title("Total ")
-% xlim([ -1 15]);
 ylim([-1 21]);
-legend(names,location="best");
+% lgd = legend(names,location="best");
+% title(lgd,"Wind Speed in m/s");
+
+%% Question 2e
+geopotential_altitude = [0 2000 4000 6000 8000 10000]; % [m], Vector of altitudes
+altitudeNames = ["zero","two","four","six","eight","ten"]; % list of names corresponding to each altitude, x1000
+for i = 1:length(altitudeNames)
+    rhos(i) = stdatmo(geopotential_altitude(i));
+end
+
+% Creating figure for part 1 of e, 1 plot, multiple curves, each curve is 1
+% geopotential altiude comparing total distance vs windspeed
+for i = 1:length(altitudeNames) % Altitude loop
+    for ii = 1:length(names) % Wind speed loop
+        [t,statevector] = ode45(@(t,x) objectEOM(t,x,rhos(i),Cd,A,m,g,windspeedvec(ii)),tspan,initialcond,options);
+        q2e.(altitudeNames(i)).(names(ii)).x = statevector(:,1); % X
+        q2e.(altitudeNames(i)).(names(ii)).y = statevector(:,2); % Y
+        q2e.(altitudeNames(i)).(names(ii)).z = statevector(:,3); % Z
+        % Calculating Total Distances
+        xend = q2e.(altitudeNames(i)).(names(ii)).x(end);
+        yend = q2e.(altitudeNames(i)).(names(ii)).y(end);
+        q2e.(altitudeNames(i)).dtot(ii) = sqrt(xend^2 + yend^2);
+    end
+end
+
+figure(); hold on;
+for i = 1:length(altitudeNames)
+    plot(q2e.(altitudeNames(i)).dtot, windspeedvec);
+end
+xlabel("Distance (m)");
+ylabel("Wind Speed (m/s)");
+title("Distance vs Wind Speed of Various Geopotential Altitudes");
+lgd = legend(altitudeNames,location="best");
+title(lgd,"Altitude in 1000s of Meters")
+
+% Plot 2 for part e, minimum distance between origin and landing point as
+% function of geopotential altitude
+figure(); hold on;
+for i = 1:length(names)
+    for ii = 1:length(altitudeNames)
+        % scatter(q2e.(altitudeNames(i)).dtot,geopotential_altitude(i));
+        tempdmin(ii) = q2e.(altitudeNames(ii)).dtot(i);
+    end
+    plot(tempdmin,geopotential_altitude)
+end
+
+xlabel("Minimum Distance (m)");
+ylabel("Geopotential Altitude (m)");
+title("Minimum Distance Between Origin and Landing Point as Function of Altitude");
+ylim([-1000 11000]);
+lgd = legend(names,location="eastoutside");
+title(lgd,"Wind Speed (m/s)");
 
 %% EOM Function
 function xDot = objectEOM(t, x, rho, Cd, A, m, g, vWind)
@@ -155,6 +205,3 @@ function xDot = objectEOM(t, x, rho, Cd, A, m, g, vWind)
     acc = (fDrag+fGrav)/m;
     xDot = [v; acc];
 end
-
-% function xdisplacement = q2dp1HorizontalDisplacement(x)
-%     xdisplacement = x(end)
