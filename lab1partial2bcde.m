@@ -3,9 +3,7 @@
 % File Name: MainLab1
 % Last Updated: 8/26/25
 
-clc
-clear
-close all
+clc; clear; close all;
 
 %% Nonzero Initial Conditions
 w = 1;
@@ -112,6 +110,38 @@ set(gca,'ZDir','reverse'); % Flipping z-axis
 legend(names); % Adds legend using name list corresponding to wind speeds
 view(45,45);
 
+% Part d1, creating plot of horizontal displacement vs wind speed
+% In meters of deflection per m/s wind speed
+figure(); hold on;
+for i = 1:length(names)
+    scatter(q2d.(names(i)).x(end),windspeedvec(i)); % Scatter plot for naming points
+    tempx(i) = q2d.(names(i)).x(end);
+end
+plot(tempx,windspeedvec); % Connecting Dots
+xlabel("Meters of Deflection (m)");
+ylabel("Wind Speed (m/s)");
+legend(names,location="best");
+title("Question 2dp1, X Displacement vs Wind Speed");
+xlim([-1 15]);
+ylim([-1 25]);
+
+% Part d2, creating plot of total distance
+% Total distance from origin dependsing on wind speed in meters of
+% deflection per m/s of wind speed
+figure(); hold on;
+for i = 1:length(names)
+    q2d.(names(i)).dtot(i) = max(sqrt(q2d.(names(i)).x(end)^2 + q2d.(names(i)).y(end)^2));
+    scatter(q2d.(names(i)).dtot,windspeedvec(i));
+    tempx2(i)= q2d.(names(i)).dtot;
+end
+plot(tempx2,windspeedvec);
+xlabel("Meters of Deflection (m)");
+ylabel("Wind Speed (m/s)");
+title("Total ")
+% xlim([ -1 15]);
+ylim([-1 21]);
+legend(names,location="best");
+
 %% EOM Function
 function xDot = objectEOM(t, x, rho, Cd, A, m, g, vWind)
 %UNTITLED2 Summary of this function goes here
@@ -125,3 +155,6 @@ function xDot = objectEOM(t, x, rho, Cd, A, m, g, vWind)
     acc = (fDrag+fGrav)/m;
     xDot = [v; acc];
 end
+
+% function xdisplacement = q2dp1HorizontalDisplacement(x)
+%     xdisplacement = x(end)
