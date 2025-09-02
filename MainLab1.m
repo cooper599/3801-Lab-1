@@ -1,4 +1,4 @@
-% Contributors: Ridley 
+% Contributors: Ridley Avila and Gunnar Robinson
 % Course Number: ASEN 3801
 % File Name: MainLab1
 % Last Updated: 09/02/25
@@ -96,4 +96,5 @@ function dstatevec_dt = odefnc(t, statevec)
                     4*w*x*y - x^2;
                     2*w - x - 2*z; 
                     x*y - y^2 - 3*(z^3)]; % dw/dt, dx/dt, dy/dt, dz/dt
+
 end
