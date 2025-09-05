@@ -165,14 +165,13 @@ m = 50e-3:10e-2:1;
 V = sqrt(T1./(0.5*m));
 spd = 1:length(m);
 vel = 1:length(m);
-figure();hold on;
+figure();
+hold on;
+
 
 for i=1:length(m)
-    i
-    m
     spd(i) = sqrt(2*T1/m(i));
     vel(i) = sqrt(0.5*(spd(i)^2));
-    vel(i)
     sVec = [0;0;0;0;vel(i);-vel(i)];
     tspan = [0 20];
     wind_vel = 0; % Wind velocity [m/s]
@@ -182,7 +181,97 @@ for i=1:length(m)
     plot3(statevector(:,1),statevector(:,2),statevector(:,3));
     set(gca, 'ZDir', 'reverse');
     view(45,45);
+    title('Question 2f, varying mass vs distance (constant KE), windspeed 0m/s')
+    xlabel('X/North (m)');
+    ylabel('Y/East (m)');
+    zlabel('Z/down (m)');
 end
 
+legendEntries = cell(size(m));
+for i = 1:length(m)
+    legendEntries{i} = ['m = ', num2str(m(i)), 'kg'];
+end
+legend(legendEntries)
+
+figure()
+hold on;
+
+for i=1:length(m)
+    spd(i) = sqrt(2*T1/m(i));
+    vel(i) = sqrt(0.5*(spd(i)^2));
+    sVec = [0;0;0;0;vel(i);-vel(i)];
+    tspan = [0 20];
+    wind_vel = 10; % Wind velocity [m/s]
+    tol = 1e-8; % Tolerance for ode45 call
+    options = odeset('RelTol',tol,'AbsTol',tol,'Events',@groundhit); % Setting tolerance options and termination event
+    [t,statevector] = ode45(@(t,x) objectEOM(t,x,rho,Cd,A,m(i),g,wind_vel),tspan,sVec,options); % Call of ode function
+    plot3(statevector(:,1),statevector(:,2),statevector(:,3));
+    set(gca, 'ZDir', 'reverse');
+    view(45,45);
+    title('Question 2f, varying mass vs distance (constant KE), windspeed 10m/s')
+    xlabel('X/North (m)');
+    ylabel('Y/East (m)');
+    zlabel('Z/down (m)');
+end
+
+legendEntries = cell(size(m));
+for i = 1:length(m)
+    legendEntries{i} = ['m = ', num2str(m(i)), 'kg'];
+end
+legend(legendEntries)
+
+figure()
+hold on;
+
+for i=1:length(m)
+    spd(i) = sqrt(2*T1/m(i));
+    vel(i) = sqrt(0.5*(spd(i)^2));
+    sVec = [0;0;0;0;vel(i);-vel(i)];
+    tspan = [0 20];
+    wind_vel = 20; % Wind velocity [m/s]
+    tol = 1e-8; % Tolerance for ode45 call
+    options = odeset('RelTol',tol,'AbsTol',tol,'Events',@groundhit); % Setting tolerance options and termination event
+    [t,statevector] = ode45(@(t,x) objectEOM(t,x,rho,Cd,A,m(i),g,wind_vel),tspan,sVec,options); % Call of ode function
+    plot3(statevector(:,1),statevector(:,2),statevector(:,3));
+    set(gca, 'ZDir', 'reverse');
+    view(45,45);
+    title('Question 2f, varying mass vs distance (constant KE), windspeed 20m/s')
+    xlabel('X/North (m)');
+    ylabel('Y/East (m)');
+    zlabel('Z/down (m)');
+end
+
+legendEntries = cell(size(m));
+for i = 1:length(m)
+    legendEntries{i} = ['m = ', num2str(m(i)), 'kg'];
+end
+legend(legendEntries)
+
+figure()
+hold on;
+
+for i=1:length(m)
+    spd(i) = sqrt(2*T1/m(i));
+    vel(i) = sqrt(0.5*(spd(i)^2));
+    sVec = [0;0;0;0;vel(i);-vel(i)];
+    tspan = [0 20];
+    wind_vel = 40; % Wind velocity [m/s]
+    tol = 1e-8; % Tolerance for ode45 call
+    options = odeset('RelTol',tol,'AbsTol',tol,'Events',@groundhit); % Setting tolerance options and termination event
+    [t,statevector] = ode45(@(t,x) objectEOM(t,x,rho,Cd,A,m(i),g,wind_vel),tspan,sVec,options); % Call of ode function
+    plot3(statevector(:,1),statevector(:,2),statevector(:,3));
+    set(gca, 'ZDir', 'reverse');
+    view(45,45);
+    title('Question 2f, varying mass vs distance (constant KE), windspeed 40m/s')
+    xlabel('X/North (m)');
+    ylabel('Y/East (m)');
+    zlabel('Z/down (m)');
+end
+
+legendEntries = cell(size(m));
+for i = 1:length(m)
+    legendEntries{i} = ['m = ', num2str(m(i)), 'kg'];
+end
+legend(legendEntries)
 
 %%
