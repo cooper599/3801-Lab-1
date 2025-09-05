@@ -163,8 +163,12 @@ title(lgd,"Wind Speed (m/s)");
 
 %% EOM Function
 function xDot = objectEOM(t, x, rho, Cd, A, m, g, vWind)
-%UNTITLED2 Summary of this function goes here
-%   Detailed explanation goes here
+% Equations of Motion of Object through air accounting for drag, gravity,
+% and initial conditions.
+%  Takes in properties from object Cd, A, m, and starting conditions. Takes
+%  in air density, windspeed, and gravity. And returns the velocity and
+%  acceleration of the object passing it into the original statevector of
+%  position and velocity.
     v = x(4:6);
     vRel = v-vWind;
     airspeed = norm(vRel);
@@ -176,7 +180,6 @@ function xDot = objectEOM(t, x, rho, Cd, A, m, g, vWind)
 end
 
 %% Part F
-%% F
 T1 = 0.5*m*(sqrt(20^2+20^2));
 m = 50e-3:10e-2:1;
 V = sqrt(T1./(0.5*m));
