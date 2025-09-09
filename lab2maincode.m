@@ -77,12 +77,56 @@ function attitude313 = EulerAngles313(DCM)
         attitude313 - 3x1 vector with 3-1-3 Euler angles in form attitude
         313 = [alpha,beta,gamma]^T
     %}
-    alpha = atan2(DCM(1,3)/DCM(2,3));
+    alpha = atan2(DCM(1,3),DCM(2,3));
     beta = acos(DCM(3,3));
-    gamma = atan2(DCM(3,1)/-DCM(3,2));
+    gamma = atan2(DCM(3,1),-DCM(3,2));
     attitude313 = [alpha beta gamma]';
 end
 
 %% Plotting
 % Function 1 Call
 [t_vec, av_pos_inert, av_att, tar_pos_inert, tar_att] = LoadASPENData("3801_Sec001_Test1.csv");
+
+%% Q5
+% Data For plotting
+for i = 1:length(t_vec)
+    DCM = RotationMatrix321(av_att(:,i));
+    attitude313 = EulerAngles313(DCM);
+    av_313_angles(i,1) = rad2deg(attitude313(1));
+    av_313_angles(i,2) = rad2deg(attitude313(2));
+    av_313_angles(i,3) = rad2deg(attitude313(3));
+end
+for i = 1:length(t_vec)
+    DCM = RotationMatrix321(tar_att(:,i));
+    attitude313 = EulerAngles313(DCM);
+    tar_313_angles(i,1) = rad2deg(attitude313(1));
+    tar_313_angles(i,2) = rad2deg(attitude313(2));
+    tar_313_angles(i,3) = rad2deg(attitude313(3));
+end
+
+
+% Plotting
+figure();
+subplot(3,1,1); hold on; % Alpha vs Time
+plot(t_vec,av_313_angles(:,1),'b'); % Plotting aerospace vehicle 313 angles
+plot(t_vec,tar_313_angles(:,1),'r'); % Plotting target 313 angles
+xlabel("Time (s)");
+ylabel("Alpha (°)");
+title("Alpha vs Time for Aerospace Vehicle and Target");
+legend("Aerospace Vehicle", "Target");
+
+subplot(3,1,2); hold on; % Beta vs Time
+plot(t_vec,av_313_angles(:,2),'b'); % Plotting aerospace vehicle 313 angles
+plot(t_vec,tar_313_angles(:,2),'r'); % Plotting target 313 angles
+xlabel("Time (s)");
+ylabel("Beta (°)");
+title("Beta vs Time for Aerospace Vehicle and Target");
+legend("Aerospace Vehicle", "Target");
+
+subplot(3,1,3); hold on; % Gamma vs Time
+plot(t_vec,av_313_angles(:,3),'b'); % Plotting aerospace vehicle 313 angles
+plot(t_vec,tar_313_angles(:,3),'r'); % Plotting target 313 angles
+xlabel("Time (s)");
+ylabel("Gamma (°)");
+title("Gamma vs Time for Aerospace Vehicle and Target");
+legend("Aerospace Vehicle", "Target");
