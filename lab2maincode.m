@@ -89,16 +89,18 @@ end
 
 %% Q5
 % Data For plotting
+av_313_angles = zeros(length(t_vec),3);
 for i = 1:length(t_vec)
     DCM = RotationMatrix321(av_att(:,i));
-    attitude313 = EulerAngles313(DCM);
+    attitude313 = EulerAngles321(DCM);
     av_313_angles(i,1) = rad2deg(attitude313(1));
     av_313_angles(i,2) = rad2deg(attitude313(2));
     av_313_angles(i,3) = rad2deg(attitude313(3));
 end
+tar_313_angles = zeros(length(t_vec),3);
 for i = 1:length(t_vec)
     DCM = RotationMatrix321(tar_att(:,i));
-    attitude313 = EulerAngles313(DCM);
+    attitude313 = EulerAngles321(DCM);
     tar_313_angles(i,1) = rad2deg(attitude313(1));
     tar_313_angles(i,2) = rad2deg(attitude313(2));
     tar_313_angles(i,3) = rad2deg(attitude313(3));
