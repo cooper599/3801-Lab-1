@@ -211,3 +211,60 @@ xlabel("Time (s)");
 ylabel("Gamma (°)");
 title("Gamma vs Time for Aerospace Vehicle and Target");
 legend("Aerospace Vehicle", "Target");
+
+%% Problem 6
+rel_pos_E = tar_pos_inert - av_pos_inert; 
+figure;
+
+subplot(3,1,1);
+plot(t_vec, rel_pos_E(1,:), 'b', 'LineWidth', 1.5);
+xlabel('Time [s]'); ylabel('x_E [m]');
+title('Problem 6: Relative Position in Frame E (x-component)');
+grid on;
+
+subplot(3,1,2);
+plot(t_vec, rel_pos_E(2,:), 'r', 'LineWidth', 1.5);
+xlabel('Time [s]'); ylabel('y_E [m]');
+title('Problem 6: Relative Position in Frame E (y-component)');
+grid on;
+
+subplot(3,1,3);
+plot(t_vec, rel_pos_E(3,:), 'g', 'LineWidth', 1.5);
+xlabel('Time [s]'); ylabel('z_E [m]');
+title('Problem 6: Relative Position in Frame E (z-component)');
+grid on;
+
+sgtitle('Problem 6: Relative Position of Target w.r.t Aerospace Vehicle in Frame E');
+
+%% Problem 7
+rel_pos_B = zeros(3,n);
+
+for k = 1:n
+   
+    C_EB = RotationMatrix321(av_att(:,k));   
+    C_BE = C_EB.';                           
+    
+    rel_pos_B(:,k) = C_BE * rel_pos_E(:,k);
+end
+
+figure;
+
+subplot(3,1,1);
+plot(t_vec, rel_pos_B(1,:), 'b', 'LineWidth', 1.5);
+xlabel('Time [s]'); ylabel('x_B [m]');
+title('Problem 7: Relative Position in Frame B (x-component)');
+grid on;
+
+subplot(3,1,2);
+plot(t_vec, rel_pos_B(2,:), 'r', 'LineWidth', 1.5);
+xlabel('Time [s]'); ylabel('y_B [m]');
+title('Problem 7: Relative Position in Frame B (y-component)');
+grid on;
+
+subplot(3,1,3);
+plot(t_vec, rel_pos_B(3,:), 'g', 'LineWidth', 1.5);
+xlabel('Time [s]'); ylabel('z_B [m]');
+title('Problem 7: Relative Position in Frame B (z-component)');
+grid on;
+
+sgtitle('Problem 7: Relative Position of Target w.r.t Aerospace Vehicle in Frame B');
